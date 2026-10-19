@@ -1,0 +1,27 @@
+# .NET build output
+**/bin/
+**/obj/
+TestResults/
+artifacts/
+
+# Local editor settings
+.vs/
+.idea/
+*.user
+*.suo
+
+# Future frontend output
+node_modules/
+dist/
+
+# Local configuration and application data
+.env
+.env.*
+!.env.example
+storage/
+backups/
+*.log
+
+# Local planning and learning notes
+/docs/
+/AGENTS.md
