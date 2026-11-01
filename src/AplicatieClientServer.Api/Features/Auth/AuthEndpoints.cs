@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Text.Json;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
@@ -13,6 +14,10 @@ public static class AuthEndpoints
         this IEndpointRouteBuilder endpoints)
     {
         var auth = endpoints.MapGroup("/auth").WithTags("Auth");
+        auth.AddEndpointFilter<AntiforgeryValidationFilter>();
+
+        auth.MapGet("/csrf", GetCsrfToken)
+            .WithSummary("Get a CSRF request token for the current browser session.");
 
         auth.MapIdentityApi<ApplicationUser>();
 
@@ -26,6 +31,15 @@ public static class AuthEndpoints
         session.MapPost("/logout", LogoutAsync);
 
         return endpoints;
+    }
+
+    private static Ok<CsrfTokenResponse> GetCsrfToken(
+        HttpContext httpContext,
+        IAntiforgery antiforgery)
+    {
+        var tokens = antiforgery.GetAndStoreTokens(httpContext);
+
+        return TypedResults.Ok(new CsrfTokenResponse(tokens.RequestToken!));
     }
 
     private static async Task<Results<Ok<CurrentUserResponse>, UnauthorizedHttpResult>>
