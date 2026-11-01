@@ -18,6 +18,10 @@ defineProps<{ sessionLabel: string }>();
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v10H3V7Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
           Мои файлы
         </a>
+        <a class="nav-link" href="#account">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.7"/><path d="M4 21v-2a8 8 0 0 1 16 0v2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          Аккаунт
+        </a>
         <a class="nav-link" href="#connection">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 15a10 10 0 0 1 14 0M8 18a6 6 0 0 1 8 0M2 11a15 15 0 0 1 20 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="21" r="1" fill="currentColor"/></svg>
           Подключение

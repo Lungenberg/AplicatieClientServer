@@ -52,3 +52,12 @@ export async function requestJson(path: string, options: RequestOptions = {}): P
     throw new ApiError("Не удалось связаться с сервером. Проверьте подключение и повторите попытку.");
   }
 }
+
+export async function postJson(path: string, body: unknown): Promise<unknown> {
+  // Antiforgery tokens are identity-bound; fetch a fresh one before every mutation.
+  const token = await requestJson("/auth/csrf");
+  if (!isRecord(token) || typeof token.requestToken !== "string" || !token.requestToken) {
+    throw new ApiError("Не удалось подготовить запрос. Обновите страницу и повторите попытку.");
+  }
+  return requestJson(path, { method: "POST", body, csrfToken: token.requestToken });
+}
