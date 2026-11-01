@@ -60,7 +60,56 @@ builder.Services.AddAntiforgery(options =>
         : CookieSecurePolicy.Always;
 });
 
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer((document, context, cancellationToken) =>
+    {
+        document.Info.Title = "ACS Drive API";
+        document.Info.Version = "v1";
+        document.Info.Description =
+            "For cookie authentication, call POST /auth/login with " +
+            "useSessionCookies=true, then use /auth/me and POST /auth/logout with {}. " +
+            "The browser sends the authentication cookie automatically. " +
+            "POST requests require a fresh /auth/csrf token in X-CSRF-TOKEN; " +
+            "Swagger UI adds it automatically.";
+
+        return Task.CompletedTask;
+    });
+});
+
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/openapi/v1.json", "ACS Drive API v1");
+        options.DocumentTitle = "ACS Drive API";
+        options.EnableTryItOutByDefault();
+        options.UseRequestInterceptor("""
+            function (request) {
+                const method = (request.method || "GET").toUpperCase();
+                const target = new URL(request.url, window.location.origin);
+                if (target.origin === window.location.origin &&
+                    target.pathname.startsWith("/auth/") &&
+                    !["GET", "HEAD", "OPTIONS"].includes(method)) {
+                    return fetch("/auth/csrf", {
+                        credentials: "same-origin",
+                        cache: "no-store"
+                    }).then(response => {
+                        if (!response.ok) throw new Error("Could not get CSRF token.");
+                        return response.json();
+                    }).then(token => {
+                        request.headers["X-CSRF-TOKEN"] = token.requestToken;
+                        return request;
+                    });
+                }
+                return request;
+            }
+            """);
+    });
+}
 
 app.UseAuthentication();
 app.UseAuthorization();
